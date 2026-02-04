@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Syntax Master - FR/EN</title>
+    <style>
+        :root { --bg: #0d1117; --calc: #21262d; --screen: #000; --accent: #58a6ff; --syntax: #ff7b72; --green: #3fb950; --error: #f85149; }
+        body { background: var(--bg); color: #fff; font-family: 'Consolas', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .calculator { width: 360px; background: var(--calc); padding: 25px; border-radius: 30px; border: 1px solid #30363d; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        
+        /* Sélecteur de langue */
+        .lang-switch { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 10px; }
+        .lang-btn { background: #30363d; border: 1px solid #444; color: #fff; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; }
+        .lang-btn.active { border-color: var(--accent); color: var(--accent); }
+
+        /* Mémento */
+        .memento { background: #000; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #444; font-size: 11px; color: #aaa; text-align: center; line-height: 1.4; }
+        .memento b { color: var(--syntax); font-family: sans-serif; }
+
+        /* Écran */
+        .screen { background: var(--screen); border: 2px solid #30363d; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+        #task-info { color: var(--accent); font-size: 13px; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 5px; font-weight: bold; }
+        #expression { font-size: 20px; color: #fff; min-height: 30px; word-wrap: break-word; margin: 5px 0; }
+        #result { font-size: 26px; color: #fff; text-align: right; min-height: 32px; font-weight: bold; }
+
+        /* Feedback */
+        #feedback-area { background: #161b22; border-radius: 10px; padding: 12px; margin-bottom: 15px; min-height: 60px; border: 1px solid #30363d; display: none; text-align: center; }
+        .correct { color: var(--green); border-color: var(--green) !important; }
+        .wrong { color: var(--error); border-color: var(--error) !important; }
+        .syntax-tip { display: block; font-size: 12px; color: #8b949e; margin-top: 8px; font-style: italic; }
+
+        /* Clavier */
+        .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        button { border: none; border-radius: 10px; padding: 16px 0; font-size: 18px; font-weight: bold; cursor: pointer; color: #fff; transition: 0.1s; }
+        .num { background: #30363d; }
+        .op { background: #484f58; color: var(--accent); }
+        .math { background: #388bfd33; color: var(--accent); border: 1px solid #388bfd66; }
+        .del { background: #da3633; }
+        .ac { background: #6e7681; }
+        .equal { background: #444; border: 1px solid #666; }
+        .validate { grid-column: span 2; background: var(--green); color: #000; }
+        .next { grid-column: span 2; background: var(--accent); }
+        button:active { transform: scale(0.95); opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <div class="lang-switch">
+        <button class="lang-btn active" onclick="setLang('FR')">FR</button>
+        <button class="lang-btn" onclick="setLang('EN')">EN</button>
+    </div>
+
+    <div class="memento" id="memento-box">
+        <b>AUG :</b> ((V2 - V1) / V1) × 100 <br>
+        <b>PART :</b> (PARTIE / TOTAL) × 100
+    </div>
+
+    <div class="screen">
+        <div id="task-info">CHARGEMENT...</div>
+        <div id="expression"></div>
+        <div id="result"></div>
+    </div>
+
+    <div id="feedback-area">
+        <span id="status-msg"></span>
+        <span id="correction-msg" class="syntax-tip"></span>
+    </div>
+
+    <div class="keys">
+        <button class="math" onclick="press('(')">(</button>
+        <button class="math" onclick="press(')')">)</button>
+        <button class="math" onclick="press('**')">^</button>
+        <button class="ac" onclick="resetDisplay()">AC</button>
+
+        <button class="math" onclick="press('10**')">10ⁿ</button>
+        <button class="op" onclick="press('/')">/</button>
+        <button class="op" onclick="press('*')">×</button>
+        <button class="del" onclick="backspace()">DEL</button>
+
+        <button class="num" onclick="press('7')">7</button>
+        <button class="num" onclick="press('8')">8</button>
+        <button class="num" onclick="press('9')">9</button>
+        <button class="op" onclick="press('-')">-</button>
+
+        <button class="num" onclick="press('4')">4</button>
+        <button class="num" onclick="press('5')">5</button>
+        <button class="num" onclick="press('6')">6</button>
+        <button class="op" onclick="press('+')">+</button>
+
+        <button class="num" onclick="press('1')">1</button>
+        <button class="num" onclick="press('2')">2</button>
+        <button class="num" onclick="press('3')">3</button>
+        <button class="equal" onclick="runCalc()">=</button>
+
+        <button class="num" onclick="press('0')">0</button>
+        <button class="num" onclick="press('.')">.</button>
+        <button class="validate" id="btn-validate" onclick="validateAnswer()">VALIDER</button>
+        
+        <button class="next" id="btn-next" style="grid-column: span 4;" onclick="nextTask()">SUIVANT ➔</button>
+    </div>
+</div>
+
+<script>
+    let currentGoal = 0, currentFormula = "", lang = 'FR';
+    const exprDisplay = document.getElementById('expression'), resDisplay = document.getElementById('result'), feedbackArea = document.getElementById('feedback-area');
+
+    const i18n = {
+        FR: { aug: "AUGMENTATION", part: "PART", val: "VALIDER", next: "SUIVANT ➔", from: "De", to: "à", in: "dans", ok: "✅ LOGIQUE CORRECTE", err: "❌ ERREUR DE SYNTAXE", calcFirst: "Calculer d'abord !", memento: "<b>AUG :</b> ((V2 - V1) / V1) × 100 <br><b>PART :</b> (PARTIE / TOTAL) × 100" },
+        EN: { aug: "INCREASE", part: "RATIO", val: "VALIDATE", next: "NEXT ➔", from: "From", to: "to", in: "in", ok: "✅ CORRECT LOGIC", err: "❌ SYNTAX ERROR", calcFirst: "Calculate first!", memento: "<b>INC :</b> ((V2 - V1) / V1) × 100 <br><b>RATIO :</b> (PART / TOTAL) × 100" }
+    };
+
+    function setLang(l) {
+        lang = l;
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.innerText === l));
+        document.getElementById('memento-box').innerHTML = i18n[l].memento;
+        document.getElementById('btn-validate').innerText = i18n[l].val;
+        document.getElementById('btn-next').innerText = i18n[l].next;
+        updateTaskDisplay();
+    }
+
+    function press(v) { exprDisplay.innerText += v.replace('**', '^'); exprDisplay.dataset.code = (exprDisplay.dataset.code || "") + v; }
+    function resetDisplay() { exprDisplay.innerText = ""; exprDisplay.dataset.code = ""; resDisplay.innerText = ""; feedbackArea.style.display = "none"; }
+    function backspace() { 
+        let c = exprDisplay.dataset.code || ""; 
+        let off = c.endsWith('10**') ? 4 : (c.endsWith('**') ? 2 : 1);
+        exprDisplay.dataset.code = c.slice(0, -off); exprDisplay.innerText = exprDisplay.innerText.slice(0, -(off === 4 ? 3 : 1));
+    }
+    function runCalc() { try { let r = eval(exprDisplay.dataset.code); resDisplay.innerText = Number.isInteger(r) ? r : r.toFixed(4); } catch { resDisplay.innerText = "Error"; } }
+
+    let taskData = {};
+    function nextTask() {
+        resetDisplay();
+        taskData.isAug = Math.random() > 0.5;
+        if (taskData.isAug) {
+            taskData.v1 = Math.floor(Math.random() * 8) + 2; taskData.v2 = Math.floor(Math.random() * 40) + 15;
+            currentGoal = ((taskData.v2 * 1000 - taskData.v1) / taskData.v1) * 100;
+            currentFormula = `(( ${taskData.v2}*10³ - ${taskData.v1} ) / ${taskData.v1}) * 100`;
+        } else {
+            taskData.p = Math.floor(Math.random() * 15) + 5; taskData.t = Math.floor(Math.random() * 25) + 10;
+            currentGoal = (taskData.p / (taskData.t * 1000)) * 100;
+            currentFormula = `( ${taskData.p} / ( ${taskData.t}*10³ )) * 100`;
+        }
+        updateTaskDisplay();
+    }
+
+    function updateTaskDisplay() {
+        let t = i18n[lang];
+        document.getElementById('task-info').innerText = taskData.isAug ? 
+            `${t.aug} : ${t.from} ${taskData.v1}M ${t.to} ${taskData.v2}Md` : 
+            `${t.part} : ${taskData.p}M ${t.in} ${taskData.t}Md ?`;
+    }
+
+    function validateAnswer() {
+        let v = parseFloat(resDisplay.innerText);
+        if (isNaN(v)) { resDisplay.innerText = i18n[lang].calcFirst; return; }
+        feedbackArea.style.display = "block";
+        let isOk = Math.abs(v - currentGoal) < (currentGoal * 0.01 + 0.001);
+        feedbackArea.className = isOk ? "correct" : "wrong";
+        document.getElementById('status-msg').innerText = isOk ? i18n[lang].ok : i18n[lang].err;
+        document.getElementById('correction-msg').innerText = isOk ? "" : `Goal: ${currentGoal.toFixed(2)}% | Formula: ${currentFormula}`;
+    }
+
+    window.onload = () => nextTask();
+</script>
+</body>
+</html>

@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pourcentages Trainer — FR/EN</title>
+  <style>
+    :root{
+      --bg:#0d1117;      /* fond */
+      --calc:#161b22;    /* bloc */
+      --panel:#21262d;   /* touches/grilles */
+      --screen:#000;     /* écran */
+      --accent:#58a6ff;  /* bleu */
+      --syntax:#ff7b72;  /* rouge/rose */
+      --green:#3fb950;   /* vert */
+      --error:#f85149;   /* rouge */
+      --muted:#8b949e;   /* gris texte */
+      --stroke:#30363d;  /* bord */
+    }
+
+    *{box-sizing:border-box}
+    body{
+      background:var(--bg);
+      color:#fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      margin:0;
+      padding: 18px 0;
+    }
+
+    .calculator{
+      width: 380px;
+      background: var(--calc);
+      padding: 22px;
+      border-radius: 26px;
+      border: 1px solid var(--stroke);
+      box-shadow: 0 25px 55px rgba(0,0,0,.55);
+    }
+
+    /* Header row */
+    .toprow{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .brand{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-weight: 900;
+      letter-spacing: .2px;
+      font-size: 13px;
+      color: #c9d1d9;
+    }
+    .brand b{ color: #fff; }
+
+    /* Language switch */
+    .lang-switch{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin:0;
+    }
+    .lang-btn{
+      background: #0b0f14;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .lang-btn.active{
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Memento */
+    .memento{
+      background: #000;
+      padding: 10px 10px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      border: 1px solid #444;
+      font-size: 11px;
+      color: #aaa;
+      text-align: center;
+      line-height: 1.45;
+    }
+    .memento b{
+      color: var(--syntax);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    /* Screen */
+    .screen{
+      background: var(--screen);
+      border: 2px solid var(--stroke);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+      user-select: none;
+    }
+    #task-info{
+      color: var(--accent);
+      font-size: 13px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #222;
+      padding-bottom: 6px;
+      font-weight: 900;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      letter-spacing: .2px;
+    }
+    #expression{
+      font-size: 18px;
+      color: #fff;
+      min-height: 28px;
+      word-wrap: break-word;
+      margin: 6px 0 2px;
+    }
+    #result{
+      font-size: 26px;
+      color: #fff;
+      text-align: right;
+      min-height: 32px;
+      font-weight: 900;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .minirow{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .minirow b{color:#fff}
+
+    /* Feedback */
+    #feedback-area{
+      background: #0b0f14;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+      min-height: 60px;
+      border: 1px solid var(--stroke);
+      display: none;
+      text-align: center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .correct{ color: var(--green); border-color: var(--green) !important; }
+    .wrong{ color: var(--error); border-color: var(--error) !important; }
+    .syntax-tip{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      font-style: italic;
+      line-height:1.35;
+      word-break: break-word;
+    }
+    .steps{
+      display:block;
+      font-size: 12px;
+      color: #c9d1d9;
+      margin-top: 8px;
+      line-height: 1.35;
+      text-align:left;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 10px;
+      padding: 10px;
+      white-space: pre-wrap;
+    }
+
+    /* Mode controls */
+    .modebar{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom: 12px;
+    }
+    .chipbtn{
+      background: #0b0f14;
+      border: 1px solid var(--stroke);
+      color: #c9d1d9;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-weight: 800;
+      letter-spacing:.2px;
+    }
+    .chipbtn.active{
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .chipbtn.good.active{ border-color: var(--green); color: var(--green); }
+
+    /* Keyboard */
+    .keys{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    button.key{
+      border: none;
+      border-radius: 12px;
+      padding: 16px 0;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      color: #fff;
+      transition: 0.08s;
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,.06);
+      user-select: none;
+    }
+    .num{ background: #2b313a; }
+    .op{ background: #3a414a; color: var(--accent); }
+    .math{ background: #388bfd26; color: var(--accent); border: 1px solid #388bfd55; }
+    .del{ background: #da3633; }
+    .ac{ background: #6e7681; color: #000; }
+    .equal{ background: #0b0f14; border: 1px solid #666; }
+    .validate{ grid-column: span 2; background: var(--green); color: #000; }
+    .next{ grid-column: span 4; background: var(--accent); color:#000; }
+
+    button.key:active{ transform: scale(0.96); opacity: 0.85; }
+
+    .help{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      text-align:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height:1.35;
+    }
+    .kbd{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      padding: 1px 6px;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: 900;
+    }
+  </style>
+</head>
+
+<body>
+<div class="calculator">
+
+  <div class="toprow">
+    <div class="brand"><b>%</b> Trainer — style calculatrice</div>
+    <div class="lang-switch">
+      <button class="lang-btn active" id="btnFR" onclick="setLang('FR')">FR</button>
+      <button class="lang-btn" id="btnEN" onclick="setLang('EN')">EN</button>
+    </div>
+  </div>
+
+  <div class="memento" id="memento-box">
+    <b>AUG :</b> ((V2 − V1) / V1) × 100 <br>
+    <b>PART :</b> (PARTIE / TOTAL) × 100
+  </div>
+
+  <div class="modebar">
+    <button class="chipbtn active" id="modeMIX" onclick="setMode('MIX')">MIX</button>
+    <button class="chipbtn" id="modeAUG" onclick="setMode('AUG')">AUG</button>
+    <button class="chipbtn" id="modePART" onclick="setMode('PART')">PART</button>
+    <button class="chipbtn active" id="lvlEASY" onclick="setLevel('EASY')">EASY</button>
+    <button class="chipbtn" id="lvlMED" onclick="setLevel('MED')">MED</button>
+    <button class="chipbtn" id="lvlHARD" onclick="setLevel('HARD')">HARD</button>
+    <button class="chipbtn good" id="chronoBtn" onclick="toggleChrono()">CHRONO OFF</button>
+    <button class="chipbtn" id="examBtn" onclick="toggleExam()">EXAM OFF</button>
+  </div>
+
+  <div class="screen">
+    <div id="task-info">CHARGEMENT...</div>
+    <div id="expression" data-code=""></div>
+    <div id="result"></div>
+    <div class="minirow">
+      <div>Score: <b><span id="score">0</span></b>/<b><span id="total">0</span></b></div>
+      <div>Streak: <b><span id="streak">0</span></b></div>
+      <div><span id="timerLabel">—</span></div>
+    </div>
+  </div>
+
+  <div id="feedback-area">
+    <div id="status-msg"></div>
+    <div id="correction-msg" class="syntax-tip"></div>
+    <div id="steps-msg" class="steps" style="display:none"></div>
+  </div>
+
+  <div class="keys">
+    <button class="key math" onclick="press('(')">(</button>
+    <button class="key math" onclick="press(')')">)</button>
+    <button class="key math" onclick="press('**')">^</button>
+    <button class="key ac" onclick="resetDisplay()">AC</button>
+
+    <button class="key math" onclick="press('10**')">10ⁿ</button>
+    <button class="key op" onclick="press('/')">/</button>
+    <button class="key op" onclick="press('*')">×</button>
+    <button class="key del" onclick="backspace()">DEL</button>
+
+    <button class="key num" onclick="press('7')">7</button>
+    <button class="key num" onclick="press('8')">8</button>
+    <button class="key num" onclick="press('9')">9</button>
+    <button class="key op" onclick="press('-')">-</button>
+
+    <button class="key num" onclick="press('4')">4</button>
+    <button class="key num" onclick="press('5')">5</button>
+    <button class="key num" onclick="press('6')">6</button>
+    <button class="key op" onclick="press('+')">+</button>
+
+    <button class="key num" onclick="press('1')">1</button>
+    <button class="key num" onclick="press('2')">2</button>
+    <button class="key num" onclick="press('3')">3</button>
+    <button class="key equal" onclick="runCalc()">=</button>
+
+    <button class="key num" onclick="press('0')">0</button>
+    <button class="key num" onclick="press('.')">.</button>
+    <button class="key validate" id="btn-validate" onclick="validateAnswer()">VALIDER</button>
+
+    <button class="key next" id="btn-next" onclick="nextTask()">SUIVANT ➔</button>
+  </div>
+
+  <div class="help" id="helpText">
+    Raccourcis : <span class="kbd">Enter</span> = calculer • <span class="kbd">V</span> = valider • <span class="kbd">N</span> = suivant • <span class="kbd">Backspace</span> = DEL
+  </div>
+
+</div>
+
+<script>
+/* =========================
+   i18n
+========================= */
+let lang = "FR";
+const i18n = {
+  FR: {
+    aug: "AUGMENTATION",
+    part: "PART",
+    mix: "MIX",
+    val: "VALIDER",
+    next: "SUIVANT ➔",
+    from: "De",
+    to: "à",
+    in: "dans",
+    q1: "Quel est le % d’augmentation ?",
+    q2: "Ça fait combien de % ?",
+    ok: "✅ RÉPONSE CORRECTE",
+    err: "❌ FAUX",
+    syntaxErr: "❌ ERREUR DE CALCUL",
+    calcFirst: "Appuie sur = pour calculer.",
+    goal: "Réponse attendue",
+    formula: "Formule",
+    steps: "Étapes",
+    memento: "<b>AUG :</b> ((V2 − V1) / V1) × 100 <br><b>PART :</b> (PARTIE / TOTAL) × 100",
+    chronoOn: "CHRONO ON",
+    chronoOff: "CHRONO OFF",
+    examOn: "EXAM ON",
+    examOff: "EXAM OFF",
+    examDone: "Examen terminé",
+    note: "Note",
+  },
+  EN: {
+    aug: "INCREASE",
+    part: "RATIO",
+    mix: "MIX",
+    val: "VALIDATE",
+    next: "NEXT ➔",
+    from: "From",
+    to: "to",
+    in: "in",
+    q1: "What is the % increase?",
+    q2: "What % is it?",
+    ok: "✅ CORRECT",
+    err: "❌ WRONG",
+    syntaxErr: "❌ CALC ERROR",
+    calcFirst: "Press = to calculate first.",
+    goal: "Expected",
+    formula: "Formula",
+    steps: "Steps",
+    memento: "<b>INC :</b> ((V2 − V1) / V1) × 100 <br><b>RATIO :</b> (PART / TOTAL) × 100",
+    chronoOn: "TIMER ON",
+    chronoOff: "TIMER OFF",
+    examOn: "EXAM ON",
+    examOff: "EXAM OFF",
+    examDone: "Exam finished",
+    note: "Score",
+  }
+};
+
+function setLang(l){
+  lang = l;
+  document.getElementById("btnFR").classList.toggle("active", l==="FR");
+  document.getElementById("btnEN").classList.toggle("active", l==="EN");
+  document.getElementById("memento-box").innerHTML = i18n[l].memento;
+  document.getElementById("btn-validate").innerText = i18n[l].val;
+  document.getElementById("btn-next").innerText = i18n[l].next;
+  updateTaskDisplay();
+}
+
+/* =========================
+   State
+========================= */
+let mode = "MIX";     // MIX | AUG | PART
+let level = "EASY";   // EASY | MED | HARD
+
+let chronoOn = false;
+let timer = null;
+let timeLeft = 0;
+
+let examOn = false;
+let examTotal = 10;
+let examDone = 0;
+let examCorrect = 0;
+
+let score = 0, total = 0, streak = 0;
+
+let currentGoal = 0;
+let currentFormulaPretty = "";
+let currentSteps = "";
+let taskData = {};
+
+/* Tolérance FIXE (pas de réglage) :
+   - pour valeurs petites, tolérance absolue 0.02
+   - sinon tolérance relative 1% du résultat
+*/
+function isClose(user, goal){
+  const absTol = 0.02;
+  const relTol = Math.abs(goal) * 0.01 + 0.001;
+  return Math.abs(user - goal) <= Math.max(absTol, relTol);
+}
+
+/* =========================
+   Mode / Level / Chrono / Exam
+========================= */
+function setMode(m){
+  mode = m;
+  document.getElementById("modeMIX").classList.toggle("active", m==="MIX");
+  document.getElementById("modeAUG").classList.toggle("active", m==="AUG");
+  document.getElementById("modePART").classList.toggle("active", m==="PART");
+  nextTask();
+}
+function setLevel(l){
+  level = l;
+  document.getElementById("lvlEASY").classList.toggle("active", l==="EASY");
+  document.getElementById("lvlMED").classList.toggle("active", l==="MED");
+  document.getElementById("lvlHARD").classList.toggle("active", l==="HARD");
+  nextTask();
+}
+function toggleChrono(){
+  chronoOn = !chronoOn;
+  document.getElementById("chronoBtn").textContent = chronoOn ? i18n[lang].chronoOn : i18n[lang].chronoOff;
+  document.getElementById("chronoBtn").classList.toggle("active", chronoOn);
+  stopTimer();
+  nextTask();
+}
+function toggleExam(){
+  examOn = !examOn;
+  examDone = 0;
+  examCorrect = 0;
+  document.getElementById("examBtn").textContent = examOn ? i18n[lang].examOn : i18n[lang].examOff;
+  document.getElementById("examBtn").classList.toggle("active", examOn);
+  nextTask();
+}
+function secondsForLevel(){
+  if(level==="EASY") return 35;
+  if(level==="MED") return 25;
+  return 18;
+}
+function startTimer(){
+  stopTimer();
+  timeLeft = secondsForLevel();
+  updateTimerLabel();
+  timer = setInterval(() => {
+    timeLeft--;
+    updateTimerLabel();
+    if(timeLeft <= 0){
+      stopTimer();
+      showFeedback(false, true);
+    }
+  }, 1000);
+}
+function stopTimer(){
+  if(timer){ clearInterval(timer); timer = null; }
+  updateTimerLabel();
+}
+function updateTimerLabel(){
+  const el = document.getElementById("timerLabel");
+  if(!chronoOn) { el.textContent = "—"; return; }
+  el.textContent = "⏱ " + Math.max(0,timeLeft) + "s";
+}
+
+/* =========================
+   Display + keypad
+========================= */
+const exprDisplay = document.getElementById('expression');
+const resDisplay  = document.getElementById('result');
+const feedbackArea = document.getElementById('feedback-area');
+
+function press(v){
+  // pretty printing: show ^ instead of **
+  const pretty = (v === '**') ? '^' : (v === '*') ? '×' : v;
+  exprDisplay.innerText += pretty;
+
+  // code storage
+  exprDisplay.dataset.code = (exprDisplay.dataset.code || "") + v;
+}
+
+function resetDisplay(){
+  exprDisplay.innerText = "";
+  exprDisplay.dataset.code = "";
+  resDisplay.innerText = "";
+  feedbackArea.style.display = "none";
+  feedbackArea.className = "";
+  document.getElementById("steps-msg").style.display = "none";
+}
+
+function backspace(){
+  let c = exprDisplay.dataset.code || "";
+  if(!c) return;
+
+  // handle tokens: 10** (4 chars) or ** (2 chars) else 1 char
+  let cut = 1;
+  if(c.endsWith("10**")) cut = 4;
+  else if(c.endsWith("**")) cut = 2;
+
+  exprDisplay.dataset.code = c.slice(0, -cut);
+
+  // pretty delete
+  // if removed token was 10** show was "10ⁿ" as 3 visible chars
+  if(c.endsWith("10**")){
+    exprDisplay.innerText = exprDisplay.innerText.slice(0, -3);
+  } else {
+    exprDisplay.innerText = exprDisplay.innerText.slice(0, -1);
+  }
+}
+
+/* =========================
+   Safe evaluator (no raw eval)
+   Allowed: digits, ., + - * / ( ) and exponent ** and 10**
+========================= */
+function safeEval(code){
+  // quick allowlist check
+  if(!/^[0-9+\-*/().\s]*$/.test(code.replaceAll("**","").replaceAll("10",""))){
+    // if code includes unexpected chars beyond allowed tokens, reject
+    throw new Error("bad_chars");
+  }
+
+  // Only allow ** exponent as operator and only numeric base/exponent expressions.
+  // We'll still use Function, but with strict filtering:
+  //  - disallow letters and other symbols entirely
+  if(/[A-Za-z_|&;=<>[\]{}]/.test(code)) throw new Error("bad_chars");
+
+  // Disallow consecutive operators that are dangerous / nonsense (basic sanity)
+  if(/[*\/]{3,}/.test(code)) throw new Error("bad_syntax");
+
+  // Evaluate in strict function scope
+  // IMPORTANT: because we filtered out letters, there is no way to call global objects.
+  // So Function here is safe enough for this use case.
+  // eslint-disable-next-line no-new-func
+  const fn = new Function('"use strict"; return (' + code + ');');
+  const v = fn();
+  if(!Number.isFinite(v)) throw new Error("nan");
+  return v;
+}
+
+function runCalc(){
+  const code = (exprDisplay.dataset.code || "").trim();
+  if(!code){ resDisplay.innerText = ""; return; }
+
+  try{
+    const r = safeEval(code);
+    // Display with nice rounding but keep precision for validation:
+    const display = (Number.isInteger(r)) ? String(r) : r.toFixed(6).replace(/0+$/,'').replace(/\.$/,'');
+    resDisplay.innerText = display;
+  }catch(e){
+    resDisplay.innerText = "Error";
+  }
+}
+
+/* =========================
+   Task generator (percent practice)
+   We generate nice “cut zeros” exercises like your notes:
+   - AUG: v1 in millions, v2 in billions -> use 10^3 simplification
+   - PART: p in millions, t in billions -> also 10^3
+========================= */
+function nextTask(){
+  resetDisplay();
+
+  // Decide task type
+  const type = (mode === "MIX") ? (Math.random() > 0.5 ? "AUG" : "PART") : mode;
+  taskData.type = type;
+
+  if(type === "AUG"){
+    // old in millions (M), new in billions (Md)
+    let v1, v2;
+    if(level === "EASY"){
+      v1 = randIntFrom([1,2,5,10,20]);
+      v2 = randRange(10, 60);
+    } else if(level === "MED"){
+      v1 = randRange(1, 80);
+      v2 = randRange(20, 220);
+    } else {
+      v1 = randRange(1, 250);
+      v2 = randRange(80, 900);
+    }
+    taskData.v1 = v1; // millions
+    taskData.v2 = v2; // billions
+
+    // Goal in %
+    currentGoal = ((v2*1000 - v1) / v1) * 100;
+
+    currentFormulaPretty = `(( ${v2}×10³ − ${v1} ) / ${v1}) × 100`;
+
+    currentSteps =
+`AUG : ((V2 − V1) / V1) × 100
+
+((${v2}×10^9) − (${v1}×10^6)) / (${v1}×10^6) × 100
+→ on coupe 10^6
+((${v2}×10^3) − ${v1}) / ${v1} × 100
+→
+(${v2*1000} − ${v1}) / ${v1} × 100
+= ${currentGoal.toFixed(2).replace(".", ",")} %`;
+
+  } else {
+    // PART: part in millions, total in billions
+    let p, t;
+    if(level === "EASY"){
+      p = randRange(5, 30);
+      t = randRange(10, 60);
+    } else if(level === "MED"){
+      p = randRange(1, 250);
+      t = randRange(20, 600);
+    } else {
+      p = randRange(1, 1200);
+      t = randRange(80, 5000);
+    }
+    taskData.p = p; // millions
+    taskData.t = t; // billions
+
+    currentGoal = (p / (t*1000)) * 100;
+
+    currentFormulaPretty = `( ${p} / ( ${t}×10³ )) × 100`;
+
+    currentSteps =
+`PART : (PARTIE / TOTAL) × 100
+
+((${p}×10^6) / (${t}×10^9)) × 100
+→ 10^6 / 10^9 = 1 / 10^3
+(${p} / (${t}×10^3)) × 100
+→
+(${p} / ${t*1000}) × 100
+= ${currentGoal.toFixed(4).replace(".", ",")} % (≈)`;
+  }
+
+  updateTaskDisplay();
+
+  if(chronoOn) startTimer();
+}
+
+function updateTaskDisplay(){
+  const t = i18n[lang];
+
+  if(taskData.type === "AUG"){
+    document.getElementById('task-info').innerText =
+      `${t.aug} : ${t.from} ${taskData.v1}M ${t.to} ${taskData.v2}Md — ${t.q1}`;
+  } else {
+    document.getElementById('task-info').innerText =
+      `${t.part} : ${taskData.p}M ${t.in} ${taskData.t}Md — ${t.q2}`;
+  }
+}
+
+/* =========================
+   Validation
+========================= */
+function validateAnswer(){
+  const t = i18n[lang];
+  const v = parseFloat((resDisplay.innerText || "").replace(",", "."));
+  if(isNaN(v)){
+    resDisplay.innerText = t.calcFirst;
+    return;
+  }
+  showFeedback(isClose(v, currentGoal), false);
+}
+
+function showFeedback(ok, timedOut){
+  const t = i18n[lang];
+  feedbackArea.style.display = "block";
+  feedbackArea.className = ok ? "correct" : "wrong";
+
+  // update stats
+  total++;
+  document.getElementById("total").innerText = total;
+
+  if(ok){
+    score++;
+    streak++;
+    if(examOn){ examCorrect++; }
+  }else{
+    streak = 0;
+  }
+  document.getElementById("score").innerText = score;
+  document.getElementById("streak").innerText = streak;
+
+  // exam progress
+  if(examOn){
+    examDone++;
+    if(examDone >= examTotal){
+      // show final and stop exam
+      const note = Math.round((examCorrect / examTotal) * 20 * 10) / 10;
+      document.getElementById('status-msg').innerText =
+        `🏁 ${t.examDone} — ${t.note}: ${examCorrect}/${examTotal} (≈ ${String(note).replace(".", ",")}/20)`;
+      document.getElementById('correction-msg').innerText = "";
+      document.getElementById("steps-msg").style.display = "none";
+      examOn = false;
+      document.getElementById("examBtn").textContent = t.examOff;
+      document.getElementById("examBtn").classList.remove("active");
+      stopTimer();
+      return;
+    }
+  }
+
+  if(timedOut){
+    document.getElementById('status-msg').innerText = `⏱ ${t.err}`;
+  } else {
+    document.getElementById('status-msg').innerText = ok ? t.ok : t.err;
+  }
+
+  if(ok){
+    document.getElementById('correction-msg').innerText = "";
+  } else {
+    document.getElementById('correction-msg').innerText =
+      `${t.goal}: ${currentGoal.toFixed(4).replace(".", ",")}%  |  ${t.formula}: ${currentFormulaPretty}`;
+  }
+
+  const stepsBox = document.getElementById("steps-msg");
+  stepsBox.style.display = ok ? "none" : "block";
+  stepsBox.textContent = currentSteps;
+
+  stopTimer();
+}
+
+/* =========================
+   Utils
+========================= */
+function randRange(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function randIntFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* =========================
+   Keyboard shortcuts
+========================= */
+document.addEventListener("keydown", (e) => {
+  // Enter => run calc, V => validate, N => next, Backspace => delete
+  if(e.key === "Enter"){ e.preventDefault(); runCalc(); return; }
+  if(e.key === "Backspace"){ e.preventDefault(); backspace(); return; }
+  const k = e.key.toLowerCase();
+  if(k === "v"){ validateAnswer(); return; }
+  if(k === "n"){ nextTask(); return; }
+});
+
+/* =========================
+   Init
+========================= */
+window.onload = () => {
+  setLang("FR");
+  // default labels
+  document.getElementById("chronoBtn").textContent = i18n[lang].chronoOff;
+  document.getElementById("examBtn").textContent = i18n[lang].examOff;
+  nextTask();
+};
+</script>
+
+</body>
+</html>
