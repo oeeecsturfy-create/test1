@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu</title>
+  <style>
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background:#0d1117;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:#fff;
+    }
+    .box{
+      background:#161b22;
+      border:1px solid #30363d;
+      border-radius:20px;
+      padding:30px;
+      width:320px;
+      text-align:center;
+      box-shadow:0 25px 50px rgba(0,0,0,.6);
+    }
+    h1{
+      font-size:20px;
+      margin-bottom:25px;
+      letter-spacing:.3px;
+    }
+    button{
+      width:100%;
+      padding:14px;
+      margin:10px 0;
+      font-size:16px;
+      font-weight:700;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      background:#58a6ff;
+      color:#000;
+      transition:transform .08s, opacity .15s;
+    }
+    button.secondary{
+      background:#21262d;
+      color:#fff;
+      border:1px solid #30363d;
+    }
+    button:active{
+      transform:scale(0.96);
+      opacity:.85;
+    }
+    .hint{
+      margin-top:18px;
+      font-size:12px;
+      color:#8b949e;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h1>Choisis une section</h1>
+
+    <!-- BOUTON 1 -->
+    <button onclick="location.href='test.html'">
+      1
+    </button>
+
+    <!-- BOUTON 2 -->
+    <button class="secondary" onclick="location.href='test2.html'">
+      2
+    </button>
+
+    <div class="hint">
+      Astuce : tu peux ajouter cette page à l’écran d’accueil 📱
+    </div>
+  </div>
+
+</body>
+</html>
