@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 794 1123" preserveAspectRatio="xMidYMid meet">
+  <rect width="100%" height="100%" fill="#111111"/>
+  
+  <text x="397" y="100" font-size="34" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif">RÉCAPITULATIF DES CALCULS (SYNTAXE)</text>
+  <line x1="60" y1="140" x2="734" y2="140" stroke="#333" stroke-width="3"/>
+
+  <g transform="translate(60, 220)">
+    <rect x="-10" y="-45" width="694" height="320" rx="20" fill="#1a1a1a" stroke="#444" stroke-width="2"/>
+    <text x="15" y="0" font-size="24" font-weight="bold" fill="#4ea8de" font-family="Arial, sans-serif">1) Augmentation : 1 million à 15 milliards</text>
+    
+    <text x="35" y="60" font-size="22" font-family="monospace">
+      <tspan fill="#ff79c6">(</tspan><tspan fill="#bd93f9">(</tspan><tspan fill="#ddd">15 * 10^9</tspan><tspan fill="#bd93f9">)</tspan><tspan fill="#ddd"> - </tspan><tspan fill="#bd93f9">(</tspan><tspan fill="#ddd">1 * 10^6</tspan><tspan fill="#bd93f9">)</tspan><tspan fill="#ff79c6">)</tspan><tspan fill="#ddd"> / </tspan><tspan fill="#bd93f9">(</tspan><tspan fill="#ddd">1 * 10^6</tspan><tspan fill="#bd93f9">)</tspan><tspan fill="#ddd"> * 100 =</tspan>
+    </text>
+    
+    <text x="35" y="110" font-size="19" font-style="italic" fill="#888" font-family="Arial, sans-serif">Simplification :</text>
+    <text x="35" y="145" font-size="22" font-family="monospace">
+      <tspan fill="#ff79c6">(</tspan><tspan fill="#bd93f9">(</tspan><tspan fill="#fff">15 * 10^3</tspan><tspan fill="#bd93f9">)</tspan><tspan fill="#fff"> - 1</tspan><tspan fill="#ff79c6">)</tspan><tspan fill="#fff"> / 1 * 100 =</tspan>
+    </text>
+    
+    <text x="35" y="195" font-size="19" font-style="italic" fill="#888" font-family="Arial, sans-serif">Calcul final :</text>
+    <text x="35" y="235" font-size="30" font-weight="bold" fill="#72efdd" font-family="monospace">
+      <tspan fill="#ff79c6">(</tspan><tspan fill="#fff">15 000 - 1</tspan><tspan fill="#ff79c6">)</tspan><tspan fill="#fff"> * 100 = 1 499 900 %</tspan>
+    </text>
+  </g>
+
+  <g transform="translate(60, 600)">
+    <rect x="-10" y="-45" width="694" height="280" rx="20" fill="#1a1a1a" stroke="#444" stroke-width="2"/>
+    <text x="15" y="0" font-size="24" font-weight="bold" fill="#4ea8de" font-family="Arial, sans-serif">2) 12 millions c'est combien de % de 17 milliards ?</text>
+    
+    <text x="35" y="60" font-size="22" font-family="monospace">
+      <tspan fill="#ff79c6">(</tspan><tspan fill="#bd93f9">(</tspan><tspan fill="#ddd">12 * 10^6</tspan><tspan fill="#bd93f9">)</tspan><tspan fill="#ddd"> / </tspan><tspan fill="#bd93f9">(</tspan><tspan fill="#ddd">17 * 10^9</tspan><tspan fill="#bd93f9">)</tspan><tspan fill="#ff79c6">)</tspan><tspan fill="#ddd"> * 100 = 0.07 %</tspan>
+    </text>
+    
+    <text x="35" y="110" font-size="19" font-style="italic" fill="#888" font-family="Arial, sans-serif">Simplification :</text>
+    <text x="35" y="145" font-size="22" font-family="monospace">
+      <tspan fill="#ff79c6">(</tspan><tspan fill="#fff">12 / </tspan><tspan fill="#bd93f9">(</tspan><tspan fill="#fff">17 * 10^3</tspan><tspan fill="#bd93f9">)</tspan><tspan fill="#ff79c6">)</tspan><tspan fill="#fff"> * 100 = 0.07 %</tspan>
+    </text>
+    
+    <text x="35" y="210" font-size="26" font-weight="bold" fill="#72efdd" font-family="Arial, sans-serif">Conclusion : 12 millions c'est 0.07% de 17 milliards</text>
+  </g>
+
+  <line x1="60" y1="1020" x2="734" y2="1020" stroke="#333" stroke-width="2"/>
+  <text x="397" y="1060" font-size="18" text-anchor="middle" fill="#aaa" font-family="Arial, sans-serif" font-style="italic">
+    Astuce : Les espaces et les couleurs facilitent la lecture des priorités.
+  </text>
+</svg>
